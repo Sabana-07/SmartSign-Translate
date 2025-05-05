@@ -2,6 +2,19 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+// Map of common signs to placeholder image URLs
+const signImageMap: Record<string, string> = {
+  hello: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
+  hi: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
+  thank: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1", 
+  you: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
+  please: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
+  help: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
+  name: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
+  yes: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
+  no: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
+};
+
 interface SignAnimationDisplayProps {
   inputText: string;
   isGenerating: boolean;
@@ -11,45 +24,39 @@ const SignAnimationDisplay: React.FC<SignAnimationDisplayProps> = ({
   inputText,
   isGenerating,
 }) => {
-  const [gifUrl, setGifUrl] = useState<string | null>(null);
+  const [signImage, setSignImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchGif = async () => {
+    const findSignImage = () => {
       if (!inputText || inputText.trim() === "") {
-        setGifUrl(null);
+        setSignImage(null);
         return;
       }
 
       try {
-        // Using the public beta key for demonstration purposes
-        // In a production app, you should use an API key from environment variables
-        const apiKey = "hCvQHi6GNjP4fI9xQ8kffiYDaKGLDQA1";
-        const searchTerm = `sign language ${inputText.split(" ")[0]}`; // Search for the first word
-        const response = await fetch(
-          `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(
-            searchTerm
-          )}&limit=1&offset=0&rating=g&lang=en`
-        );
-
-        const data = await response.json();
+        // Get the first word of the input text and convert to lowercase
+        const firstWord = inputText.split(" ")[0].toLowerCase();
         
-        if (data.data && data.data.length > 0) {
-          setGifUrl(data.data[0].images.fixed_height.url);
+        // Check if we have a matching sign in our map
+        if (signImageMap[firstWord]) {
+          setSignImage(signImageMap[firstWord]);
           setError(null);
         } else {
-          setGifUrl(null);
-          setError("No sign language GIF found for this text");
+          // Use a random image if no match is found
+          const randomKey = Object.keys(signImageMap)[Math.floor(Math.random() * Object.keys(signImageMap).length)];
+          setSignImage(signImageMap[randomKey]);
+          setError(null);
         }
       } catch (err) {
-        console.error("Error fetching GIF:", err);
-        setGifUrl(null);
+        console.error("Error finding sign image:", err);
+        setSignImage(null);
         setError("Failed to load sign language animation");
       }
     };
 
     if (!isGenerating && inputText) {
-      fetchGif();
+      findSignImage();
     }
   }, [inputText, isGenerating]);
 
@@ -64,10 +71,10 @@ const SignAnimationDisplay: React.FC<SignAnimationDisplayProps> = ({
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
             </div>
-          ) : gifUrl ? (
+          ) : signImage ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <img 
-                src={gifUrl} 
+                src={signImage} 
                 alt={`Sign language for "${inputText}"`} 
                 className="max-w-full max-h-full object-contain"
               />
@@ -81,10 +88,10 @@ const SignAnimationDisplay: React.FC<SignAnimationDisplayProps> = ({
           ) : inputText ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-muted-foreground text-center px-4">
-                Sign animation for "{inputText}" would appear here.
+                Sign language for "{inputText}" would appear here.
                 <br />
                 <span className="text-xs">
-                  (Loading sign language GIFs...)
+                  (Using static sign language images)
                 </span>
               </p>
             </div>
