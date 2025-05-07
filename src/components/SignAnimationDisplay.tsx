@@ -1,119 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Map of sign language words to placeholder image URLs
-// This would be replaced with AI-generated images in a production environment
-const signImageMap: Record<string, string> = {
-  // Common greeting signs
-  hello: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  hi: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  
-  // Words from the sign language list (using rotation of placeholder images)
-  all: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  animal: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  bad: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  because: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  bird: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  black: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  blood: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  child: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  count: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  day: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  die: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  dirty: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  dog: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  dry: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  earth: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  egg: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  father: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  fire: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  fish: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  flower: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  good: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  grass: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  green: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  heavy: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  how: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  hunt: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  husband: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  ice: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  if: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  kill: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  laugh: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  leaf: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  lie: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  live: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  long: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  
-  // Continue with more words from the image
-  man: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  meat: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  mother: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  mountain: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  name: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  night: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  not: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  old: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  other: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  person: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  play: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  rain: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  red: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  right: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  river: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  rope: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  salt: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  sea: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  sharp: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  short: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  sing: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  sit: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  smooth: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  snake: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  snow: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  stand: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  star: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  stone: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  sun: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  tail: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  thin: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  tree: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  vomit: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  warm: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  water: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  wet: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  what: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  when: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  where: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  white: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  who: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  wide: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  wife: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  wind: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  with: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  woman: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  wood: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  worm: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  year: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  yellow: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  full: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  moon: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  brother: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  cat: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  dance: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  pig: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-  sister: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  work: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  
-  // Common phrases
-  thank: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1", 
-  you: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  please: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  help: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-  yes: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-  no: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-};
+import { aiImageService } from "@/services/aiImageService";
 
 interface SignAnimationDisplayProps {
   inputText: string;
@@ -127,45 +15,70 @@ const SignAnimationDisplay: React.FC<SignAnimationDisplayProps> = ({
   const [signImage, setSignImage] = useState<string | null>(null);
   const [matchedWord, setMatchedWord] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingImage, setIsLoadingImage] = useState<boolean>(false);
+
+  // List of supported sign language words
+  const supportedWords = [
+    "hello", "hi", "all", "animal", "bad", "because", "bird", "black", 
+    "blood", "child", "count", "day", "die", "dirty", "dog", "dry", 
+    "earth", "egg", "father", "fire", "fish", "flower", "good", "grass", 
+    "green", "heavy", "how", "hunt", "husband", "ice", "if", "kill", 
+    "laugh", "leaf", "lie", "live", "long", "man", "meat", "mother", 
+    "mountain", "name", "night", "not", "old", "other", "person", "play", 
+    "rain", "red", "right", "river", "rope", "salt", "sea", "sharp", 
+    "short", "sing", "sit", "smooth", "snake", "snow", "stand", "star", 
+    "stone", "sun", "tail", "thin", "tree", "vomit", "warm", "water", 
+    "wet", "what", "when", "where", "white", "who", "wide", "wife", 
+    "wind", "with", "woman", "wood", "worm", "year", "yellow", "full", 
+    "moon", "brother", "cat", "dance", "pig", "sister", "work", 
+    "thank", "you", "please", "help", "yes", "no"
+  ];
 
   useEffect(() => {
-    const findSignImage = () => {
+    const findSignImage = async () => {
       if (!inputText || inputText.trim() === "") {
         setSignImage(null);
         setMatchedWord(null);
+        setError(null);
         return;
       }
 
       try {
+        setIsLoadingImage(true);
+        setError(null);
+        
         // Get the words from the input text and convert to lowercase
         const words = inputText.toLowerCase().split(/\s+/);
         
-        // Try to find a match in our sign image map
+        // Try to find a match in our supported words list
         let foundMatch = false;
         
         for (const word of words) {
-          if (signImageMap[word]) {
-            setSignImage(signImageMap[word]);
+          if (supportedWords.includes(word)) {
+            // Generate the sign language image for this word
+            const imageUrl = await aiImageService.getSignLanguageImage(word);
+            setSignImage(imageUrl);
             setMatchedWord(word);
-            setError(null);
             foundMatch = true;
             break;
           }
         }
         
         if (!foundMatch) {
-          // Use a random image if no match is found
-          const keys = Object.keys(signImageMap);
-          const randomKey = keys[Math.floor(Math.random() * keys.length)];
-          setSignImage(signImageMap[randomKey]);
+          // If no exact match, use the first word for demonstration
+          const firstWord = words[0];
+          const imageUrl = await aiImageService.getSignLanguageImage(firstWord);
+          setSignImage(imageUrl);
           setMatchedWord(null);
-          setError(`No exact match found for "${inputText}". Showing a random sign.`);
+          setError(`No exact match found for "${inputText}". Showing approximation for "${firstWord}".`);
         }
       } catch (err) {
         console.error("Error finding sign image:", err);
         setSignImage(null);
         setMatchedWord(null);
         setError("Failed to load sign language animation");
+      } finally {
+        setIsLoadingImage(false);
       }
     };
 
@@ -181,7 +94,7 @@ const SignAnimationDisplay: React.FC<SignAnimationDisplayProps> = ({
       </CardHeader>
       <CardContent>
         <div className="sign-animation-container">
-          {isGenerating ? (
+          {isGenerating || isLoadingImage ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
             </div>
@@ -215,7 +128,7 @@ const SignAnimationDisplay: React.FC<SignAnimationDisplayProps> = ({
                 Sign language for "{inputText}" would appear here.
                 <br />
                 <span className="text-xs">
-                  (Using static sign language images)
+                  (AI-generated sign language images)
                 </span>
               </p>
             </div>
